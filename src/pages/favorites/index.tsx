@@ -2,30 +2,21 @@ import { Row, Stack } from "react-bootstrap";
 import { Title } from "../../components/title";
 import { useEffect, useState } from "react";
 import { IProjeto } from "../highlightedProjects";
-import { ServicesApi } from "../../services";
+import { useProjectsHook } from "../../contexts/projects";
 
 export const Favorites = () => {
+  const { isLoading, projects } = useProjectsHook();
   const [projetos, setProjetos] = useState<IProjeto[] | null>(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
-    ServicesApi.getProjects()
-      .then((data) => {
-        const savedFavorites = localStorage.getItem("favorite");
-        const favoritesArray = savedFavorites ? JSON.parse(savedFavorites) : [];
+    const savedFavorites = localStorage.getItem("favorite");
+    const favoritesArray = savedFavorites ? JSON.parse(savedFavorites) : [];
 
-        const favorites = data.filter((projeto: IProjeto) =>
-          favoritesArray.includes(projeto.id)
-        );
+    const favorites = projects?.filter((projeto: IProjeto) =>
+      favoritesArray.includes(projeto.id)
+    );
 
-        setProjetos(favorites);
-        return favorites;
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => setLoading(false));
+    setProjetos(favorites || []);
   }, []);
 
   return (
@@ -34,7 +25,7 @@ export const Favorites = () => {
         <Title title="Favoritos" />
       </Row>
 
-      {loading ? (
+      {isLoading ? (
         <p>Carregando...</p>
       ) : (
         projetos?.map((el) => (

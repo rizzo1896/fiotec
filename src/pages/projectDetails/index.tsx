@@ -3,27 +3,16 @@ import { Title } from "../../components/title";
 import { useEffect, useState } from "react";
 import { IProjeto } from "../highlightedProjects";
 import { Container, Row, Stack } from "react-bootstrap";
-import { ServicesApi } from "../../services";
+import { useProjectsHook } from "../../contexts/projects";
 
 export const ProjectDetails = () => {
   const { id } = useParams<{ id: string }>();
-  console.log(id);
   const [projectSelected, setProjectSelected] = useState<IProjeto | null>(null);
-  const [loading, setLoading] = useState(false);
+  const { isLoading, getById } = useProjectsHook();
 
   useEffect(() => {
     if (!id) return;
-    setLoading(true);
-    ServicesApi.getProjectById(id)
-      .then((data) => {
-        setProjectSelected(data);
-
-        return data;
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-      .finally(() => setLoading(false));
+    getById(id).then((data) => setProjectSelected(data));
   }, [id]);
 
   return (
@@ -31,7 +20,7 @@ export const ProjectDetails = () => {
       <Title title="Projetos em Destaque" />
 
       <Container as={Row} fluid className="mt-4 ps-0">
-        {loading ? (
+        {isLoading ? (
           <p>Carregando...</p>
         ) : (
           <Stack className="ps-0">

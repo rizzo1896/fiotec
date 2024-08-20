@@ -77,7 +77,7 @@ export const InfoCard = ({
         <CustomButton
           title="Acessar"
           onClick={() => {
-            navigate(`/projeto/${data.id}`);
+            navigate(`/projetos-destaque/${data.id}`);
           }}
           icon="view"
         />

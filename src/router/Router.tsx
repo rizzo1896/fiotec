@@ -19,7 +19,7 @@ export const router = createBrowserRouter([
       },
       {
         element: <ProjectDetails />,
-        path: "/projeto/:id",
+        path: "/projetos-destaque/:id",
       },
       {
         element: <Favorites />,

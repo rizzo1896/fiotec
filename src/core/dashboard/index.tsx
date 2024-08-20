@@ -1,16 +1,24 @@
 import { Col, Container, Nav, Navbar, Row } from "react-bootstrap";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import user from "../../assets/images/user_icon.png";
+import { useProjectsHook } from "../../contexts/projects";
 
 export const Dashboard = () => {
+  const { categories } = useProjectsHook();
+  const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { pathname } = window.location;
+
+  const getQueryParams = (query: string) => {
+    return new URLSearchParams(location.search).get(query);
+  };
+  const category = getQueryParams("category");
+
   return (
     <>
       <div>
         {/* Navbar do Topo */}
-        <Navbar bg="light" expand="lg" className="shadow-sm">
+        <Navbar collapseOnSelect bg="light" expand="lg" className="shadow-sm">
           <Container>
             <Navbar.Brand
               onClick={() => {
@@ -25,8 +33,9 @@ export const Dashboard = () => {
               <Nav className="me-auto ms-4">
                 <Nav.Link
                   onClick={() => {
-                    navigate("/projetos-destaque");
+                    navigate("/");
                   }}
+                  active={pathname === "/"}
                 >
                   Home
                 </Nav.Link>
@@ -34,6 +43,7 @@ export const Dashboard = () => {
                   onClick={() => {
                     navigate("/projetos-destaque");
                   }}
+                  active={pathname === "/projetos-destaque"}
                 >
                   Projetos em Destaque
                 </Nav.Link>
@@ -41,6 +51,7 @@ export const Dashboard = () => {
                   onClick={() => {
                     navigate("/favoritos");
                   }}
+                  active={pathname === "/favoritos"}
                 >
                   Meus Favoritos
                 </Nav.Link>
@@ -89,41 +100,38 @@ export const Dashboard = () => {
               >
                 <h5 style={{ fontWeight: 700 }}>Filtrar por categoria</h5>
 
-                <Nav
-                  activeKey="/"
-                  onSelect={(selectedKey) => alert(`selected ${selectedKey}`)}
-                  className="flex-column"
-                >
-                  <Nav.Item>
-                    <Nav.Link href="/" className="px-0 text-body">
-                      Todos
-                    </Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link className="px-0 text-body">Ensino</Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link className="px-0 text-body">Pesquisa</Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link className="px-0 text-body">
-                      Estímulo à Inovação
-                    </Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link className="px-0 text-body">Extensão</Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link className="px-0 text-body">
-                      Desenvolvimento Institucional
-                    </Nav.Link>
-                  </Nav.Item>
-                  <Nav.Item>
-                    <Nav.Link className="px-0 text-body">
-                      Desenvolvimento Científico e Tecnológico
-                    </Nav.Link>
-                  </Nav.Item>
-                </Nav>
+                <Navbar>
+                  <Nav className="flex-column">
+                    <Nav.Item>
+                      <Nav.Link
+                        className="px-0"
+                        onClick={() => {
+                          navigate("/projetos-destaque");
+                        }}
+                        active={!category}
+                      >
+                        Todos
+                      </Nav.Link>
+                    </Nav.Item>
+                    {categories?.map((categoryItem) => (
+                      <Nav.Item key={categoryItem.id}>
+                        <Nav.Link
+                          className="px-0"
+                          onClick={() => {
+                            navigate({
+                              pathname: `/projetos-destaque`,
+                              search: `?category=${categoryItem.id}`,
+                            });
+                          }}
+                          eventKey={categoryItem.id.toString()}
+                          active={categoryItem.id.toString() === category}
+                        >
+                          {categoryItem.label}
+                        </Nav.Link>
+                      </Nav.Item>
+                    ))}
+                  </Nav>
+                </Navbar>
               </Col>
             ) : null}
 
